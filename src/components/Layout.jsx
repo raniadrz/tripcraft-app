@@ -7,12 +7,14 @@ import TripPlanner from './TripPlanner'
 import CustomerList from './CRM/CustomerList'
 import CustomerDetail from './CRM/CustomerDetail'
 import FieldTemplateManager from './CRM/FieldTemplateManager'
-import { Plane, Users, LogOut, Menu, X, Settings2, ChevronDown, ChevronUp, UserCog } from 'lucide-react'
+import { Plane, Users, LogOut, Menu, X, Settings2, ChevronDown, ChevronUp, UserCog, HardDrive } from 'lucide-react'
 import AccountSettings from './AccountSettings'
+import FileManager from './FileManager'
 
 const NAV = [
-  { id: 'trip',      label: 'Νέο Ταξίδι',   icon: Plane },
-  { id: 'customers', label: 'Πελάτες CRM',   icon: Users },
+  { id: 'trip',      label: 'Νέο Ταξίδι',        icon: Plane },
+  { id: 'customers', label: 'Πελάτες CRM',        icon: Users },
+  { id: 'files',     label: 'Αρχεία Server',      icon: HardDrive },
   { id: 'account',   label: 'Ο Λογαριασμός μου', icon: UserCog },
 ]
 
@@ -173,6 +175,7 @@ export default function Layout() {
           <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e1b4b', flex: 1 }}>
             {page === 'trip' ? '✈️ Νέο Ταξίδι'
               : page === 'account' ? '⚙️ Ο Λογαριασμός μου'
+              : page === 'files' ? '🗄️ Αρχεία Server'
               : selectedCustomerId ? '👤 Στοιχεία Πελάτη'
               : '👥 Πελάτες CRM'}
           </div>
@@ -224,6 +227,9 @@ export default function Layout() {
           )}
           {page === 'account' && (
             <AccountSettings />
+          )}
+          {page === 'files' && (
+            <FileManager />
           )}
           {page === 'customers' && !selectedCustomerId && (
             <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 24px rgba(79,70,229,0.08)', border: '1px solid #e0e7ff', padding: '28px' }}>

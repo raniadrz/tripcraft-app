@@ -48,7 +48,20 @@ const uploadImg = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB για avatars
 })
 
+// ── Helpers ───────────────────────────────────────────────
+function listDir(dir, urlPrefix) {
+  if (!fs.existsSync(dir)) return []
+  return fs.readdirSync(dir).map(filename => {
+    const stat = fs.statSync(path.join(dir, filename))
+    return { filename, size: stat.size, createdAt: stat.birthtimeMs, url: `${urlPrefix}/${filename}` }
+  }).sort((a, b) => b.createdAt - a.createdAt)
+}
+
 // ── PDF routes ────────────────────────────────────────────
+app.get('/files', (_req, res) => {
+  res.json(listDir(PDF_DIR, `http://localhost:${PORT}/files`))
+})
+
 app.post('/files/upload', uploadPdf.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Δεν βρέθηκε αρχείο.' })
   const fileId = path.basename(req.file.filename, '.pdf')
@@ -72,6 +85,10 @@ app.delete('/files/:fileId', (req, res) => {
 })
 
 // ── Image routes ──────────────────────────────────────────
+app.get('/images', (_req, res) => {
+  res.json(listDir(IMG_DIR, `http://localhost:${PORT}/images`))
+})
+
 app.post('/images/upload', uploadImg.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Δεν βρέθηκε εικόνα.' })
   const photoId = req.file.filename          // uuid.ext
