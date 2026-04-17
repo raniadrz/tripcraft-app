@@ -33,7 +33,15 @@ export default function TripPlanner({ customers = [], onGoToCRM }) {
   const user = useAuth()
 
   // Settings
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('or_apikey') || '')
+  const [apiKey, setApiKey] = useState(() => {
+    try {
+      const raw = localStorage.getItem('or_apikey')
+      if (!raw) return ''
+      const { key, expires } = JSON.parse(raw)
+      if (expires && Date.now() > expires) { localStorage.removeItem('or_apikey'); return '' }
+      return key || ''
+    } catch { return localStorage.getItem('or_apikey') || '' } // legacy plain string
+  })
   const [activeModel, setActiveModel] = useState('')
 
   // Trip params
@@ -57,7 +65,11 @@ export default function TripPlanner({ customers = [], onGoToCRM }) {
   const [savedToCustomer, setSavedToCustomer] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  function saveApiKey(key) { setApiKey(key); localStorage.setItem('or_apikey', key) }
+  function saveApiKey(key, ttlDays) {
+    setApiKey(key)
+    const expires = ttlDays ? Date.now() + ttlDays * 86_400_000 : null
+    localStorage.setItem('or_apikey', JSON.stringify({ key, expires }))
+  }
 
   function buildPrompt() {
     const segments = destinations.map((d, i) => {

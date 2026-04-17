@@ -12,16 +12,24 @@ const s = {
   title: { fontSize: '16px', fontWeight: '700', color: '#312e81', flex: 1 },
 }
 
+const TTL_OPTIONS = [
+  { label: '7 ημέρες', days: 7 },
+  { label: '30 ημέρες', days: 30 },
+  { label: '1 χρόνο', days: 365 },
+  { label: 'Για πάντα', days: null },
+]
+
 export default function SettingsPanel({ apiKey, setApiKey, activeModel }) {
   const [draft, setDraft] = useState(apiKey)
   const [showKey, setShowKey] = useState(false)
   const [open, setOpen] = useState(!apiKey)
   const [saved, setSaved] = useState(false)
+  const [ttl, setTtl] = useState(30) // days, null = forever
 
   const isDirty = draft !== apiKey
 
   function handleSave() {
-    setApiKey(draft)
+    setApiKey(draft, ttl)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -75,6 +83,28 @@ export default function SettingsPanel({ apiKey, setApiKey, activeModel }) {
               <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" style={{ color: '#4f46e5' }}>openrouter.ai/keys</a>
               {' '}— Χρησιμοποιεί αυτόματα δωρεάν μοντέλα.
             </p>
+          </div>
+
+          <div>
+            <label style={s.label}>Διάρκεια αποθήκευσης</label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {TTL_OPTIONS.map(opt => (
+                <button
+                  key={opt.label}
+                  onClick={() => setTtl(opt.days)}
+                  style={{
+                    padding: '6px 14px', borderRadius: '20px', fontSize: '13px',
+                    fontWeight: '600', cursor: 'pointer', transition: 'all 0.15s',
+                    border: '1.5px solid',
+                    borderColor: ttl === opt.days ? '#4f46e5' : '#e5e7eb',
+                    background: ttl === opt.days ? '#ede9fe' : 'white',
+                    color: ttl === opt.days ? '#4f46e5' : '#6b7280',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
