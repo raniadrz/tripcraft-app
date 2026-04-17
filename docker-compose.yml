@@ -1,0 +1,11 @@
+services:
+  fileserver:
+    build: ./server
+    ports:
+      - "3001:3001"
+    volumes:
+      - file_uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  file_uploads:
