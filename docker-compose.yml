@@ -13,7 +13,7 @@ services:
         VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
         VITE_FIREBASE_MEASUREMENT_ID: ${VITE_FIREBASE_MEASUREMENT_ID}
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       - fileserver
     restart: unless-stopped
