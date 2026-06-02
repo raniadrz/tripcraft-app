@@ -12,9 +12,7 @@ export default function CustomerList({ onSelect, templates = [] }) {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    load()
-  }, [])
+  useEffect(() => { load() }, [])
 
   async function load() {
     setLoading(true)
@@ -42,26 +40,48 @@ export default function CustomerList({ onSelect, templates = [] }) {
   )
 
   return (
-    <div>
+    <div style={{ animation:'pageEnter .5s ease both' }}>
+      <style>{`
+        @keyframes pageEnter { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes rowSlideIn {
+          from { opacity:0; transform:translateX(-10px); }
+          to   { opacity:1; transform:translateX(0); }
+        }
+        .cust-row { transition:all .15s ease !important; animation:rowSlideIn .35s ease both; }
+        .cust-row:hover { background:rgba(124,58,237,.1) !important; border-color:rgba(124,58,237,.4) !important; transform:translateX(3px); }
+        .search-input:focus { border-color:rgba(124,58,237,.6) !important; box-shadow:0 0 0 3px rgba(124,58,237,.15) !important; }
+        .search-input { transition:border .2s, box-shadow .2s; }
+        ::placeholder { color:rgba(148,163,184,.35) !important; }
+      `}</style>
+
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Users size={20} color="#4f46e5" />
-          <span style={{ fontSize: '18px', fontWeight: '700', color: '#1e1b4b' }}>
-            Πελάτες
-          </span>
-          <span style={{ background: '#eef2ff', color: '#4f46e5', borderRadius: '20px', padding: '2px 10px', fontSize: '13px', fontWeight: '700' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'22px', flexWrap:'wrap', gap:'12px' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+          <Users size={20} color="#a78bfa" />
+          <span style={{
+            fontSize:'18px', fontWeight:'800',
+            background:'linear-gradient(135deg,#fff 30%,#a78bfa 100%)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+          }}>Πελάτες</span>
+          <span style={{
+            background:'linear-gradient(135deg,#7c3aed,#ec4899)',
+            color:'white', borderRadius:'20px',
+            padding:'2px 10px', fontSize:'12px', fontWeight:'700',
+          }}>
             {customers.length}
           </span>
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
           style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            background: showForm ? '#f3f4f6' : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-            color: showForm ? '#374151' : 'white', border: 'none',
-            borderRadius: '10px', padding: '9px 18px', cursor: 'pointer',
-            fontWeight: '700', fontSize: '14px',
+            display:'flex', alignItems:'center', gap:'7px',
+            background: showForm ? 'rgba(255,255,255,.08)' : 'linear-gradient(135deg,#7c3aed,#ec4899)',
+            color: showForm ? 'rgba(148,163,184,.8)' : 'white',
+            border: showForm ? '1px solid rgba(255,255,255,.1)' : 'none',
+            borderRadius:'12px', padding:'10px 20px', cursor:'pointer',
+            fontWeight:'700', fontSize:'14px',
+            boxShadow: showForm ? 'none' : '0 4px 16px rgba(124,58,237,.4)',
+            transition:'all .18s ease',
           }}
         >
           <UserPlus size={15} />
@@ -71,94 +91,122 @@ export default function CustomerList({ onSelect, templates = [] }) {
 
       {/* Add form */}
       {showForm && (
-        <div style={{ background: '#f8f7ff', border: '1px solid #e0e7ff', borderRadius: '14px', padding: '24px', marginBottom: '20px' }}>
-          <div style={{ fontSize: '15px', fontWeight: '700', color: '#312e81', marginBottom: '16px' }}>Νέος Πελάτης</div>
+        <div style={{
+          background:'rgba(124,58,237,.08)',
+          border:'1px solid rgba(124,58,237,.2)',
+          borderRadius:'16px', padding:'24px', marginBottom:'20px',
+          animation:'pageEnter .3s ease both',
+        }}>
+          <div style={{
+            fontSize:'15px', fontWeight:'700', marginBottom:'16px',
+            background:'linear-gradient(135deg,#fff 30%,#a78bfa 100%)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+          }}>
+            Νέος Πελάτης
+          </div>
           <CustomerForm templates={templates} onSave={handleAdd} onCancel={() => setShowForm(false)} saving={saving} />
         </div>
       )}
 
       {/* Search */}
-      <div style={{ position: 'relative', marginBottom: '16px' }}>
-        <Search size={15} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+      <div style={{ position:'relative', marginBottom:'18px' }}>
+        <Search size={15} color="rgba(148,163,184,.5)" style={{ position:'absolute', left:'13px', top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} />
         <input
+          className="search-input"
           type="text"
           placeholder="Αναζήτηση πελάτη..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
-            width: '100%', padding: '10px 12px 10px 36px',
-            borderRadius: '10px', border: '1px solid #d1d5db',
-            fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+            width:'100%', padding:'11px 14px 11px 40px',
+            borderRadius:'12px',
+            border:'1px solid rgba(255,255,255,.1)',
+            background:'rgba(255,255,255,.06)',
+            color:'#f1f5f9',
+            fontSize:'14px', outline:'none', boxSizing:'border-box',
           }}
         />
       </div>
 
       {/* List */}
       {loading ? (
-        <div style={{ textAlign: 'center', color: '#6b7280', padding: '40px' }}>Φόρτωση...</div>
+        <div style={{ textAlign:'center', padding:'48px', color:'rgba(167,139,250,.7)' }}>
+          <div style={{
+            width:'36px', height:'36px',
+            border:'3px solid rgba(124,58,237,.25)', borderTopColor:'#7c3aed',
+            borderRadius:'50%', animation:'spin .8s linear infinite',
+            margin:'0 auto 12px',
+          }} />
+          <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+          Φόρτωση...
+        </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', color: '#9ca3af', padding: '48px 20px' }}>
-          <Users size={40} color="#d1d5db" style={{ margin: '0 auto 12px' }} />
-          <div style={{ fontSize: '15px', fontWeight: '600' }}>
+        <div style={{ textAlign:'center', padding:'56px 20px', color:'rgba(148,163,184,.5)' }}>
+          <Users size={44} color="rgba(124,58,237,.3)" style={{ margin:'0 auto 14px' }} />
+          <div style={{ fontSize:'15px', fontWeight:'600', color:'rgba(167,139,250,.8)', marginBottom:'4px' }}>
             {search ? 'Δεν βρέθηκαν αποτελέσματα' : 'Δεν έχεις πελάτες ακόμα'}
           </div>
-          <div style={{ fontSize: '13px', marginTop: '4px' }}>Πάτα «Νέος Πελάτης» για να προσθέσεις</div>
+          <div style={{ fontSize:'13px' }}>Πάτα «Νέος Πελάτης» για να προσθέσεις</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {filtered.map(c => (
+        <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
+          {filtered.map((c, idx) => (
             <div
               key={c.id}
+              className="cust-row"
               onClick={() => onSelect(c)}
               style={{
-                background: 'white', border: '1px solid #e0e7ff', borderRadius: '12px',
-                padding: '14px 16px', cursor: 'pointer', transition: 'all 0.15s',
-                display: 'flex', alignItems: 'center', gap: '14px',
+                background:'rgba(255,255,255,.04)',
+                border:'1px solid rgba(124,58,237,.15)',
+                borderRadius:'14px', padding:'14px 18px',
+                cursor:'pointer',
+                display:'flex', alignItems:'center', gap:'14px',
+                animationDelay: `${idx * 0.05}s`,
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f1'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = '#e0e7ff'}
             >
-              {/* Avatar */}
               <div style={{
-                width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
-                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'white', fontWeight: '700', fontSize: '16px',
+                width:'42px', height:'42px', borderRadius:'50%', flexShrink:0,
+                background:'linear-gradient(135deg,#7c3aed,#ec4899)',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                color:'white', fontWeight:'700', fontSize:'17px',
+                boxShadow:'0 0 12px rgba(124,58,237,.4)',
               }}>
                 {(c.name || '?')[0].toUpperCase()}
               </div>
 
-              {/* Info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '15px' }}>{c.name}</div>
-                <div style={{ display: 'flex', gap: '12px', marginTop: '2px', flexWrap: 'wrap' }}>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontWeight:'700', color:'#f1f5f9', fontSize:'15px', marginBottom:'2px' }}>{c.name}</div>
+                <div style={{ display:'flex', gap:'12px', flexWrap:'wrap' }}>
                   {c.email && (
-                    <span style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize:'12px', color:'rgba(148,163,184,.6)', display:'flex', alignItems:'center', gap:'4px' }}>
                       <Mail size={11} />{c.email}
                     </span>
                   )}
                   {c.phone && (
-                    <span style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize:'12px', color:'rgba(148,163,184,.6)', display:'flex', alignItems:'center', gap:'4px' }}>
                       <Phone size={11} />{c.phone}
                     </span>
                   )}
                   {c.city && (
-                    <span style={{ fontSize: '12px', color: '#6b7280' }}>📍 {c.city}</span>
+                    <span style={{ fontSize:'12px', color:'rgba(148,163,184,.6)' }}>📍 {c.city}</span>
                   )}
                 </div>
               </div>
 
-              {/* Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
                 <button
                   onClick={e => handleDelete(e, c.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d1d5db', padding: '6px', display: 'flex', borderRadius: '6px' }}
+                  style={{
+                    background:'none', border:'none', cursor:'pointer',
+                    color:'rgba(148,163,184,.3)', padding:'6px', display:'flex', borderRadius:'8px',
+                    transition:'all .15s',
+                  }}
                   onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
-                  onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(148,163,184,.3)'}
                 >
                   <Trash2 size={15} />
                 </button>
-                <ChevronRight size={18} color="#9ca3af" />
+                <ChevronRight size={18} color="rgba(167,139,250,.5)" />
               </div>
             </div>
           ))}

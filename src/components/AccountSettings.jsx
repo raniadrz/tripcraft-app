@@ -1,80 +1,93 @@
 import { useState } from 'react'
 import {
-  updateProfile,
-  updateEmail,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
+  updateProfile, updateEmail, updatePassword,
+  reauthenticateWithCredential, EmailAuthProvider,
 } from 'firebase/auth'
 import { auth } from '../firebase'
 import { useAuth } from '../context/AuthContext'
 import { User, Mail, Lock, Check, AlertCircle, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 
-const s = {
+const D = {
   card: {
-    background: 'white', borderRadius: '16px',
-    boxShadow: '0 4px 24px rgba(79,70,229,0.08)',
-    border: '1px solid #e0e7ff', padding: '28px', marginBottom: '20px',
+    background: 'rgba(255,255,255,.04)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(124,58,237,.15)',
+    borderRadius: '18px',
+    padding: '28px',
+    marginBottom: '20px',
   },
-  label: { fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' },
+  label: {
+    fontSize: '11px', fontWeight: '600',
+    color: 'rgba(167,139,250,.85)',
+    display: 'block', marginBottom: '7px',
+    letterSpacing: '0.6px', textTransform: 'uppercase',
+  },
   input: {
-    width: '100%', padding: '10px 12px', borderRadius: '8px',
-    border: '1px solid #d1d5db', fontSize: '14px', outline: 'none',
+    width: '100%', padding: '11px 14px', borderRadius: '10px',
+    border: '1px solid rgba(255,255,255,.1)',
+    background: 'rgba(255,255,255,.06)',
+    color: '#f1f5f9',
+    fontSize: '14px', outline: 'none',
     boxSizing: 'border-box', fontFamily: 'inherit',
-  },
-  btn: {
-    display: 'flex', alignItems: 'center', gap: '7px',
-    padding: '10px 20px', borderRadius: '8px', fontWeight: '600',
-    fontSize: '14px', cursor: 'pointer', border: 'none', transition: 'all 0.2s',
+    transition: 'border .2s, box-shadow .2s',
   },
   sectionTitle: {
-    fontSize: '15px', fontWeight: '700', color: '#312e81',
+    fontSize: '15px', fontWeight: '700',
     display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px',
-  },
-  success: {
-    background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px',
-    padding: '10px 14px', color: '#166534', display: 'flex',
-    alignItems: 'center', gap: '8px', fontSize: '13px', marginTop: '12px',
-  },
-  error: {
-    background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px',
-    padding: '10px 14px', color: '#991b1b', display: 'flex',
-    alignItems: 'center', gap: '8px', fontSize: '13px', marginTop: '12px',
+    background: 'linear-gradient(135deg,#fff 30%,#a78bfa 100%)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
 }
 
 function StatusMsg({ ok, msg }) {
   if (!msg) return null
   return (
-    <div style={ok ? s.success : s.error}>
+    <div style={{
+      background: ok ? 'rgba(16,185,129,.12)' : 'rgba(220,38,38,.12)',
+      border: `1px solid ${ok ? 'rgba(16,185,129,.3)' : 'rgba(220,38,38,.3)'}`,
+      borderRadius: '10px', padding: '10px 14px',
+      color: ok ? '#6ee7b7' : '#fca5a5',
+      display: 'flex', alignItems: 'center', gap: '8px',
+      fontSize: '13px', marginTop: '12px',
+    }}>
       {ok ? <Check size={14} /> : <AlertCircle size={14} />}
       {msg}
     </div>
   )
 }
 
-// Re-auth modal — needed before changing email or password
 function ReauthModal({ onConfirm, onCancel, loading }) {
   const [pass, setPass] = useState('')
   const [show, setShow] = useState(false)
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
-      zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+      position:'fixed', inset:0,
+      background:'rgba(0,0,0,.7)', backdropFilter:'blur(8px)',
+      zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:'20px',
     }}>
       <div style={{
-        background: 'white', borderRadius: '16px', padding: '28px',
-        maxWidth: '380px', width: '100%',
-        boxShadow: '0 8px 40px rgba(79,70,229,0.15)',
+        background:'rgba(13,8,41,.95)',
+        border:'1px solid rgba(124,58,237,.3)',
+        borderRadius:'20px', padding:'32px',
+        maxWidth:'380px', width:'100%',
+        boxShadow:'0 24px 60px rgba(0,0,0,.6)',
+        animation:'pageEnter .3s ease both',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-          <ShieldCheck size={20} color="#4f46e5" />
-          <span style={{ fontWeight: '700', fontSize: '16px', color: '#1e1b4b' }}>Επιβεβαίωση ταυτότητας</span>
+        <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'14px' }}>
+          <ShieldCheck size={20} color="#a78bfa" />
+          <span style={{
+            fontWeight:'700', fontSize:'16px',
+            background:'linear-gradient(135deg,#fff 30%,#a78bfa 100%)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+          }}>
+            Επιβεβαίωση ταυτότητας
+          </span>
         </div>
-        <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '14px' }}>
+        <p style={{ fontSize:'13px', color:'rgba(148,163,184,.7)', marginBottom:'18px' }}>
           Για να αλλάξεις email ή κωδικό, πληκτρολόγησε τον τρέχοντα κωδικό σου.
         </p>
-        <div style={{ position: 'relative', marginBottom: '16px' }}>
+        <div style={{ position:'relative', marginBottom:'18px' }}>
           <input
             autoFocus
             type={show ? 'text' : 'password'}
@@ -82,28 +95,37 @@ function ReauthModal({ onConfirm, onCancel, loading }) {
             value={pass}
             onChange={e => setPass(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && pass && onConfirm(pass)}
-            style={{ ...s.input, paddingRight: '38px' }}
+            style={{ ...D.input, paddingRight:'42px' }}
           />
           <button onClick={() => setShow(v => !v)} style={{
-            position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-            background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
+            position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)',
+            background:'none', border:'none', cursor:'pointer', color:'rgba(148,163,184,.5)',
           }}>
             {show ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display:'flex', gap:'10px' }}>
           <button
             onClick={() => onConfirm(pass)}
             disabled={!pass || loading}
             style={{
-              ...s.btn,
-              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-              color: 'white', opacity: (!pass || loading) ? 0.6 : 1, flex: 1,
+              display:'flex', alignItems:'center', gap:'7px',
+              padding:'11px 20px', borderRadius:'10px', fontWeight:'700',
+              fontSize:'14px', cursor: (!pass || loading) ? 'not-allowed' : 'pointer',
+              border:'none', flex:1,
+              background:'linear-gradient(135deg,#7c3aed,#ec4899)',
+              color:'white', opacity: (!pass || loading) ? 0.55 : 1,
+              boxShadow:'0 4px 16px rgba(124,58,237,.4)',
             }}
           >
             {loading ? 'Έλεγχος...' : 'Επιβεβαίωση'}
           </button>
-          <button onClick={onCancel} style={{ ...s.btn, background: '#f3f4f6', color: '#374151' }}>
+          <button onClick={onCancel} style={{
+            display:'flex', alignItems:'center', padding:'11px 18px',
+            borderRadius:'10px', fontWeight:'600', fontSize:'14px', cursor:'pointer',
+            background:'rgba(255,255,255,.06)', color:'rgba(148,163,184,.8)',
+            border:'1px solid rgba(255,255,255,.1)',
+          }}>
             Ακύρωση
           </button>
         </div>
@@ -115,17 +137,13 @@ function ReauthModal({ onConfirm, onCancel, loading }) {
 export default function AccountSettings() {
   const user = useAuth()
 
-  // Display name
   const [displayName, setDisplayName] = useState(user?.displayName || '')
   const [nameStatus, setNameStatus] = useState({ ok: null, msg: '' })
   const [savingName, setSavingName] = useState(false)
 
-  // Email
   const [newEmail, setNewEmail] = useState(user?.email || '')
   const [emailStatus, setEmailStatus] = useState({ ok: null, msg: '' })
-  const [savingEmail, setSavingEmail] = useState(false)
 
-  // Password
   const [newPass, setNewPass] = useState('')
   const [confirmPass, setConfirmPass] = useState('')
   const [showNew, setShowNew] = useState(false)
@@ -133,16 +151,13 @@ export default function AccountSettings() {
   const [passStatus, setPassStatus] = useState({ ok: null, msg: '' })
   const [savingPass, setSavingPass] = useState(false)
 
-  // Re-auth modal
-  const [reauth, setReauth] = useState(null) // null | { action: 'email' | 'password', loading: false }
+  const [reauth, setReauth] = useState(null)
 
-  // ── helpers ──────────────────────────────────────────
   async function reAuthenticate(currentPassword) {
     const credential = EmailAuthProvider.credential(user.email, currentPassword)
     await reauthenticateWithCredential(user, credential)
   }
 
-  // ── display name ─────────────────────────────────────
   async function handleSaveName() {
     setSavingName(true)
     setNameStatus({ ok: null, msg: '' })
@@ -156,7 +171,6 @@ export default function AccountSettings() {
     }
   }
 
-  // ── email — needs re-auth ─────────────────────────────
   function requestEmailChange() {
     if (!newEmail || newEmail === user.email) return
     setReauth({ action: 'email', loading: false })
@@ -176,15 +190,12 @@ export default function AccountSettings() {
     }
   }
 
-  // ── password — needs re-auth ──────────────────────────
   function requestPasswordChange() {
     if (!newPass || newPass !== confirmPass) {
-      setPassStatus({ ok: false, msg: 'Οι κωδικοί δεν ταιριάζουν.' })
-      return
+      setPassStatus({ ok: false, msg: 'Οι κωδικοί δεν ταιριάζουν.' }); return
     }
     if (newPass.length < 6) {
-      setPassStatus({ ok: false, msg: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.' })
-      return
+      setPassStatus({ ok: false, msg: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.' }); return
     }
     setPassStatus({ ok: null, msg: '' })
     setReauth({ action: 'password', loading: false })
@@ -197,8 +208,7 @@ export default function AccountSettings() {
       await reAuthenticate(currentPassword)
       await updatePassword(auth.currentUser, newPass)
       setReauth(null)
-      setNewPass('')
-      setConfirmPass('')
+      setNewPass(''); setConfirmPass('')
       setPassStatus({ ok: true, msg: 'Ο κωδικός άλλαξε επιτυχώς!' })
     } catch (e) {
       setReauth(null)
@@ -211,9 +221,31 @@ export default function AccountSettings() {
     else if (reauth?.action === 'password') confirmPasswordChange(pass)
   }
 
-  // ── render ────────────────────────────────────────────
+  const saveBtn = (disabled, ok, label, loadingLabel) => ({
+    display: 'flex', alignItems: 'center', gap: '8px',
+    padding: '11px 22px', borderRadius: '10px', fontWeight: '700',
+    fontSize: '14px', cursor: disabled ? 'not-allowed' : 'pointer',
+    border: 'none',
+    background: ok ? 'rgba(16,185,129,.8)' : 'linear-gradient(135deg,#7c3aed,#ec4899)',
+    color: 'white',
+    opacity: disabled ? 0.5 : 1,
+    boxShadow: disabled ? 'none' : '0 4px 16px rgba(124,58,237,.35)',
+    transition: 'all .18s ease',
+  })
+
   return (
-    <div style={{ maxWidth: '560px' }}>
+    <div style={{ maxWidth:'560px', animation:'pageEnter .5s ease both' }}>
+      <style>{`
+        @keyframes pageEnter { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .acc-input:focus { border-color:rgba(124,58,237,.6) !important; box-shadow:0 0 0 3px rgba(124,58,237,.15) !important; }
+        .acc-card { animation:pageEnter .4s ease both; }
+        .acc-card:nth-child(1) { animation-delay:.05s; }
+        .acc-card:nth-child(2) { animation-delay:.12s; }
+        .acc-card:nth-child(3) { animation-delay:.19s; }
+        .save-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+        .save-btn { transition:all .18s ease; }
+        ::placeholder { color:rgba(148,163,184,.35) !important; }
+      `}</style>
 
       {reauth && (
         <ReauthModal
@@ -224,32 +256,29 @@ export default function AccountSettings() {
       )}
 
       {/* Display Name */}
-      <div style={s.card}>
-        <div style={s.sectionTitle}>
-          <User size={17} color="#4f46e5" />
+      <div className="acc-card" style={D.card}>
+        <div style={D.sectionTitle}>
+          <User size={17} color="#a78bfa" style={{ WebkitTextFillColor:'initial', flexShrink:0 }} />
           Εμφανιζόμενο Όνομα
         </div>
         <div>
-          <label style={s.label}>Όνομα</label>
+          <label style={D.label}>Όνομα</label>
           <input
+            className="acc-input"
             type="text"
             placeholder="π.χ. Γιώργος Παπαδόπουλος"
             value={displayName}
             onChange={e => { setDisplayName(e.target.value); setNameStatus({ ok: null, msg: '' }) }}
             onKeyDown={e => e.key === 'Enter' && handleSaveName()}
-            style={s.input}
+            style={D.input}
           />
         </div>
-        <div style={{ marginTop: '14px' }}>
+        <div style={{ marginTop:'16px' }}>
           <button
+            className="save-btn"
             onClick={handleSaveName}
             disabled={savingName || !displayName.trim()}
-            style={{
-              ...s.btn,
-              background: nameStatus.ok ? '#22c55e' : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-              color: 'white',
-              opacity: (savingName || !displayName.trim()) ? 0.6 : 1,
-            }}
+            style={saveBtn(savingName || !displayName.trim(), nameStatus.ok)}
           >
             {nameStatus.ok ? <Check size={15} /> : <User size={15} />}
             {savingName ? 'Αποθήκευση...' : nameStatus.ok ? 'Αποθηκεύτηκε!' : 'Αποθήκευση ονόματος'}
@@ -259,31 +288,28 @@ export default function AccountSettings() {
       </div>
 
       {/* Email */}
-      <div style={s.card}>
-        <div style={s.sectionTitle}>
-          <Mail size={17} color="#4f46e5" />
+      <div className="acc-card" style={D.card}>
+        <div style={D.sectionTitle}>
+          <Mail size={17} color="#a78bfa" style={{ WebkitTextFillColor:'initial', flexShrink:0 }} />
           Διεύθυνση Email
         </div>
         <div>
-          <label style={s.label}>Νέο Email</label>
+          <label style={D.label}>Νέο Email</label>
           <input
+            className="acc-input"
             type="email"
             value={newEmail}
             onChange={e => { setNewEmail(e.target.value); setEmailStatus({ ok: null, msg: '' }) }}
             onKeyDown={e => e.key === 'Enter' && requestEmailChange()}
-            style={s.input}
+            style={D.input}
           />
         </div>
-        <div style={{ marginTop: '14px' }}>
+        <div style={{ marginTop:'16px' }}>
           <button
+            className="save-btn"
             onClick={requestEmailChange}
             disabled={!newEmail || newEmail === user?.email}
-            style={{
-              ...s.btn,
-              background: emailStatus.ok ? '#22c55e' : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-              color: 'white',
-              opacity: (!newEmail || newEmail === user?.email) ? 0.4 : 1,
-            }}
+            style={saveBtn(!newEmail || newEmail === user?.email, emailStatus.ok)}
           >
             {emailStatus.ok ? <Check size={15} /> : <Mail size={15} />}
             {emailStatus.ok ? 'Αποθηκεύτηκε!' : 'Αλλαγή Email'}
@@ -293,66 +319,64 @@ export default function AccountSettings() {
       </div>
 
       {/* Password */}
-      <div style={s.card}>
-        <div style={s.sectionTitle}>
-          <Lock size={17} color="#4f46e5" />
+      <div className="acc-card" style={D.card}>
+        <div style={D.sectionTitle}>
+          <Lock size={17} color="#a78bfa" style={{ WebkitTextFillColor:'initial', flexShrink:0 }} />
           Αλλαγή Κωδικού
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
           <div>
-            <label style={s.label}>Νέος Κωδικός</label>
-            <div style={{ position: 'relative' }}>
+            <label style={D.label}>Νέος Κωδικός</label>
+            <div style={{ position:'relative' }}>
               <input
+                className="acc-input"
                 type={showNew ? 'text' : 'password'}
                 placeholder="Τουλάχιστον 6 χαρακτήρες"
                 value={newPass}
                 onChange={e => { setNewPass(e.target.value); setPassStatus({ ok: null, msg: '' }) }}
-                style={{ ...s.input, paddingRight: '38px' }}
+                style={{ ...D.input, paddingRight:'42px' }}
               />
               <button onClick={() => setShowNew(v => !v)} style={{
-                position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-                background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
+                position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)',
+                background:'none', border:'none', cursor:'pointer', color:'rgba(148,163,184,.5)',
               }}>
                 {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
           </div>
           <div>
-            <label style={s.label}>Επιβεβαίωση Κωδικού</label>
-            <div style={{ position: 'relative' }}>
+            <label style={D.label}>Επιβεβαίωση Κωδικού</label>
+            <div style={{ position:'relative' }}>
               <input
+                className="acc-input"
                 type={showConfirm ? 'text' : 'password'}
                 placeholder="Επανάληψη νέου κωδικού"
                 value={confirmPass}
                 onChange={e => { setConfirmPass(e.target.value); setPassStatus({ ok: null, msg: '' }) }}
                 onKeyDown={e => e.key === 'Enter' && requestPasswordChange()}
                 style={{
-                  ...s.input, paddingRight: '38px',
-                  borderColor: confirmPass && newPass !== confirmPass ? '#f87171' : '#d1d5db',
+                  ...D.input, paddingRight:'42px',
+                  borderColor: confirmPass && newPass !== confirmPass ? 'rgba(239,68,68,.5)' : undefined,
                 }}
               />
               <button onClick={() => setShowConfirm(v => !v)} style={{
-                position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-                background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af',
+                position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)',
+                background:'none', border:'none', cursor:'pointer', color:'rgba(148,163,184,.5)',
               }}>
                 {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
             {confirmPass && newPass !== confirmPass && (
-              <p style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>Οι κωδικοί δεν ταιριάζουν</p>
+              <p style={{ fontSize:'12px', color:'rgba(239,68,68,.8)', marginTop:'5px' }}>Οι κωδικοί δεν ταιριάζουν</p>
             )}
           </div>
         </div>
-        <div style={{ marginTop: '14px' }}>
+        <div style={{ marginTop:'16px' }}>
           <button
+            className="save-btn"
             onClick={requestPasswordChange}
             disabled={savingPass || !newPass || !confirmPass}
-            style={{
-              ...s.btn,
-              background: passStatus.ok ? '#22c55e' : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-              color: 'white',
-              opacity: (savingPass || !newPass || !confirmPass) ? 0.5 : 1,
-            }}
+            style={saveBtn(savingPass || !newPass || !confirmPass, passStatus.ok)}
           >
             {passStatus.ok ? <Check size={15} /> : <Lock size={15} />}
             {savingPass ? 'Αλλαγή...' : passStatus.ok ? 'Άλλαξε!' : 'Αλλαγή Κωδικού'}
@@ -360,7 +384,6 @@ export default function AccountSettings() {
         </div>
         <StatusMsg {...passStatus} />
       </div>
-
     </div>
   )
 }
@@ -373,7 +396,7 @@ function friendlyError(code) {
     'auth/invalid-email': 'Μη έγκυρη μορφή email.',
     'auth/weak-password': 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.',
     'auth/too-many-requests': 'Πολλές αποτυχημένες προσπάθειες. Δοκίμασε αργότερα.',
-    'auth/requires-recent-login': 'Απαιτείται πρόσφατη σύνδεση. Αποσυνδέσου και ξανά-συνδέσου.',
+    'auth/requires-recent-login': 'Απαιτείται πρόσφατη σύνδεση.',
     'auth/operation-not-allowed': 'Η ενέργεια δεν επιτρέπεται.',
   }
   return map[code] || `Σφάλμα: ${code}`
